@@ -6,15 +6,18 @@
 
 install_root = "/home/vagrant"
 
-%w(git ruby).each do |pack_name|
+%w(git ruby apt).each do |pack_name|
   package "#{pack_name}" do
-    not_if 'which #{pack_name}'
     action :install
   end
 end
-%w(zlib1g-dev libreadline-dev libyaml-dev).each do |pack_name|
-  package pack_name.to_s do
-    not_if "which #{pack_name}"
+
+package 'apt-get' do
+  action :update
+end
+
+%w(curl g++ zlib1g-dev libreadline-dev libyaml-dev libssl-dev).each do |pkg|
+  package pkg do
     action :install
   end
 end
@@ -42,8 +45,8 @@ bash "install ruby & grobal" do
   not_if { File.exist? "#{install_root}/.rbenv/versions/2.3.0" }
   code <<-"EOS"
     source /etc/profile
-    rbenv install 2.3.0
+    CONFIGURE_OPTS="--disable-install-rdoc" rbenv install 2.3.0
     rbenv rehash
-    rbenv grobal 2.3.0
+    rbenv global 2.3.0
   EOS
 end
