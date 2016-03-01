@@ -62,7 +62,7 @@ git "#{install_root}/.rbenv/plugins/ruby-build" do
 end
 
 bash "ruby install" do
-  not_if "source /etc/profile.d/rbenv.sh; rbenv versions | grep #{node.build}}"
+  not_if "source /etc/profile.d/rbenv.sh; rbenv versions | grep #{node.build}"
   code "source /etc/profile.d/rbenv.sh; CONFIGURE_OPTS=\"--disable-install-rdoc\" rbenv install #{node.build}"
   user "#{node.user}"
   action :run
@@ -71,4 +71,11 @@ end
 execute "ruby change" do
   command "source /etc/profile.d/rbenv.sh; rbenv global #{node.build};rbenv rehash"
   action :run
+end
+
+
+%w(rake bundler rspec).each do |package|
+  gem_package "#{package}" do
+    action :install
+  end
 end
